@@ -15,7 +15,7 @@ val cfgKotlinJvmTarget by extra("17")
 
 subprojects {
     group = "xyz.mufanc.aproc"
-    version = "0.1.0"
+    version = "0.2.0"
 }
 
 tasks.register<Delete>("clean") {

@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.agp.app)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
-    id("xyz.mufanc.aproc") version "0.1.0"
+    id("xyz.mufanc.aproc") version "0.2.0"
 }
 
 val cfgMinSdkVersion: Int by rootProject.extra
