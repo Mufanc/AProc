@@ -12,6 +12,7 @@ val cfgCompileSdkVersion by extra(34)
 val cfgSourceCompatibility by extra(JavaVersion.VERSION_17)
 val cfgTargetCompatibility by extra(JavaVersion.VERSION_17)
 val cfgKotlinJvmTarget by extra("17")
+val cfgNdkVersion by extra("29.0.13113456")
 
 subprojects {
     group = "xyz.mufanc.aproc"

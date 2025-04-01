@@ -30,10 +30,12 @@ val cfgCompileSdkVersion: Int by rootProject.extra
 val cfgSourceCompatibility: JavaVersion by rootProject.extra
 val cfgTargetCompatibility: JavaVersion by rootProject.extra
 val cfgKotlinJvmTarget: String by rootProject.extra
+val cfgNdkVersion: String by rootProject.extra
 
 android {
     namespace = "xyz.mufanc.aproc"
     compileSdk = cfgCompileSdkVersion
+    ndkVersion = cfgNdkVersion
 
     defaultConfig {
         applicationId = "xyz.mufanc.aproc"
@@ -55,6 +57,13 @@ android {
 
     kotlinOptions {
         jvmTarget = cfgKotlinJvmTarget
+    }
+
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = "3.22.1"
+        }
     }
 }
 

@@ -7,6 +7,7 @@ object Main {
 
     @JvmStatic
     fun main(vararg args: String) {
+        System.loadLibrary("demo_a")
         println("args: [${args.joinToString(", ")}]")
     }
 }

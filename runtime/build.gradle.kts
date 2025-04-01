@@ -38,6 +38,13 @@ android {
     publishing {
         singleVariant("release")
     }
+
+    sourceSets {
+        getByName("main") {
+            java.srcDirs("external/manifest-editor/lib/src/main/java")
+            resources.srcDirs("external/manifest-editor/lib/src/main")
+        }
+    }
 }
 
 dependencies {
