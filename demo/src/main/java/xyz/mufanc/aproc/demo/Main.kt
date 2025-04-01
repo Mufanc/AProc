@@ -1,8 +1,8 @@
 package xyz.mufanc.aproc.demo
 
-import xyz.mufanc.aproc.annotation.AProc
+import xyz.mufanc.aproc.annotation.ShellEntry
 
-@AProc
+@ShellEntry
 object Main {
 
     @JvmStatic
