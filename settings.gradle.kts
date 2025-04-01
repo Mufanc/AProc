@@ -32,11 +32,8 @@ dependencyResolutionManagement {
 
 rootProject.name = "AProc"
 
+include(":demo")
 include(":annotation")
 include(":ksp")
 include(":runtime")
 include(":plugin")
-
-if (!System.getenv("BUILD_DEMO").isNullOrEmpty()) {
-    include(":demo")
-}

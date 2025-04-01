@@ -2,7 +2,26 @@ plugins {
     alias(libs.plugins.agp.app)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
-    id("xyz.mufanc.aproc") version "0.2.0"
+}
+
+buildscript {
+    if (project.hasProperty("demo")) {
+        repositories {
+            mavenLocal {
+                content {
+                    includeGroup("xyz.mufanc.aproc")
+                }
+            }
+        }
+
+        dependencies {
+            classpath("xyz.mufanc.aproc:plugin:${project.version}")
+        }
+    }
+}
+
+if (project.hasProperty("demo")) {
+    apply(plugin = "xyz.mufanc.aproc")
 }
 
 val cfgMinSdkVersion: Int by rootProject.extra
@@ -36,5 +55,12 @@ android {
 
     kotlinOptions {
         jvmTarget = cfgKotlinJvmTarget
+    }
+}
+
+dependencies {
+    if (!project.hasProperty("demo")) {
+        compileOnly(project(":annotation"))
+        compileOnly(project(":runtime"))
     }
 }
