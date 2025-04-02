@@ -18,7 +18,3 @@ subprojects {
     group = "xyz.mufanc.aproc"
     version = "0.3.0"
 }
-
-tasks.register<Delete>("clean") {
-    delete(rootProject.file("demo/build"))
-}
