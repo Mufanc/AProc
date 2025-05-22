@@ -9,6 +9,12 @@
 1. in **settings.gradle.kts**
 
 ```kotlin
+pluginManagement {
+    repositories {
+        maven("https://jitpack.io")
+    }
+}
+
 dependencyResolutionManagement {
     repositories {
         maven("https://jitpack.io")
