@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.agp.app)
     alias(libs.plugins.kotlin.android)
@@ -29,7 +31,7 @@ val cfgTargetSdkVersion: Int by rootProject.extra
 val cfgCompileSdkVersion: Int by rootProject.extra
 val cfgSourceCompatibility: JavaVersion by rootProject.extra
 val cfgTargetCompatibility: JavaVersion by rootProject.extra
-val cfgKotlinJvmTarget: String by rootProject.extra
+val cfgKotlinJvmTarget: JvmTarget by rootProject.extra
 val cfgNdkVersion: String by rootProject.extra
 
 android {
@@ -55,15 +57,17 @@ android {
         targetCompatibility = cfgTargetCompatibility
     }
 
-    kotlinOptions {
-        jvmTarget = cfgKotlinJvmTarget
-    }
-
     externalNativeBuild {
         cmake {
             path = file("src/main/cpp/CMakeLists.txt")
             version = "3.22.1"
         }
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(cfgKotlinJvmTarget)
     }
 }
 

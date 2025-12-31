@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id("maven-publish")
     alias(libs.plugins.agp.lib)
@@ -8,7 +10,7 @@ val cfgMinSdkVersion: Int by rootProject.extra
 val cfgCompileSdkVersion: Int by rootProject.extra
 val cfgSourceCompatibility: JavaVersion by rootProject.extra
 val cfgTargetCompatibility: JavaVersion by rootProject.extra
-val cfgKotlinJvmTarget: String by rootProject.extra
+val cfgKotlinJvmTarget: JvmTarget by rootProject.extra
 
 android {
     namespace = "xyz.mufanc.aproc.runtime"
@@ -31,10 +33,6 @@ android {
         targetCompatibility = cfgTargetCompatibility
     }
 
-    kotlinOptions {
-        jvmTarget = cfgKotlinJvmTarget
-    }
-
     publishing {
         singleVariant("release")
     }
@@ -44,6 +42,12 @@ android {
             java.srcDirs("external/manifest-editor/lib/src/main/java")
             resources.srcDirs("external/manifest-editor/lib/src/main")
         }
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(cfgKotlinJvmTarget)
     }
 }
 
