@@ -6,7 +6,7 @@ import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
-import xyz.mufanc.aproc.annotation.ShellEntry
+import xyz.mufanc.aproc.annotation.AProcEntry
 import java.util.Properties
 
 class AProcProcessor(
@@ -22,7 +22,7 @@ class AProcProcessor(
 
     override fun process(resolver: Resolver): List<KSAnnotated> = env.run {
         mEntries.addAll(
-            resolver.getSymbolsWithAnnotation(ShellEntry::class.qualifiedName!!)
+            resolver.getSymbolsWithAnnotation(AProcEntry::class.qualifiedName!!)
                 .filterIsInstance<KSClassDeclaration>().toList()
                 .map { it.qualifiedName!!.asString() }
         )

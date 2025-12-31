@@ -1,3 +1,0 @@
-[submodule "runtime/external/manifest-editor"]
-	path = runtime/external/manifest-editor
-	url = https://github.com/WindySha/ManifestEditor

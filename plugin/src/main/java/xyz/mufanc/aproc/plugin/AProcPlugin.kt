@@ -30,6 +30,20 @@ class AProcPlugin : Plugin<Project> {
         private const val LFH_SIGN = 0x04034b50  // PK\3\4
     }
 
+    private fun<T: Any> T?.expect(message: String): T {
+        if (this == null) {
+            throw NullPointerException(message)
+        }
+
+        return this
+    }
+
+    private fun String.capitalize(): String {
+        return replaceFirstChar {
+            if (it.isLowerCase()) it.titlecase() else it.toString()
+        }
+    }
+
     override fun apply(project: Project) {
         project.afterEvaluate {
             project.plugins.withId("com.android.application") {
@@ -37,9 +51,22 @@ class AProcPlugin : Plugin<Project> {
 
                 android.applicationVariants.forEach { variant ->
                     variant.outputs.forEach { output ->
+                        val kspTask = project.tasks.findByName("ksp${variant.name.capitalize()}Kotlin").expect("ksp task not found")
+                        val propsFile = project.layout.buildDirectory
+                            .dir("generated/ksp/${variant.name}/resources/META-INF/aproc.properties")
+                            .get().asFile
+
+                        kspTask.doLast {
+                            val runtimeProps = propsFile.inputStream().use { Properties().apply { load(it) } }
+                            runtimeProps["targetSdk"] = "${android.defaultConfig.targetSdk!!}"
+                            runtimeProps.store(propsFile.outputStream(), null)
+                        }
+
                         val assembleTask = variant.assembleProvider.get()
+
                         assembleTask.doLast {
-                            apk2ash(output.outputFile)
+                            val runtimeProps = propsFile.inputStream().use { Properties().apply { load(it) } }
+                            apk2ash(output.outputFile, runtimeProps.expect("runtime props is null"))
                         }
                     }
                 }
@@ -59,7 +86,7 @@ class AProcPlugin : Plugin<Project> {
         }
     }
 
-    private fun apk2ash(apk: File) {
+    private fun apk2ash(apk: File, runtimeProps: Properties) {
         val ash = File(apk.parentFile, apk.nameWithoutExtension + ".ash")
 
         RandomAccessFile(apk, "r").use { apkRaf ->
@@ -70,15 +97,23 @@ class AProcPlugin : Plugin<Project> {
                 val apkBuffer = apkChannel.map(FileChannel.MapMode.READ_ONLY, 0, apkChannel.size()).apply { order(ByteOrder.LITTLE_ENDIAN) }
                 val ashBuffer = ashChannel.map(FileChannel.MapMode.READ_WRITE, 0, apkChannel.size() + PAGE_ALIGN).apply { order(ByteOrder.LITTLE_ENDIAN) }
 
-                apk2ash(apkBuffer, ashBuffer, apkChannel.size().toInt())
+                apk2ash(apkBuffer, ashBuffer, apkChannel.size().toInt(), runtimeProps)
             }
         }
     }
 
-    private fun apk2ash(apk: MappedByteBuffer, ash: MappedByteBuffer, size: Int) {
+    private fun parseBootstrapScript(runtimeProps: Properties): ByteArray {
+        return javaClass.getResourceAsStream("/bootstrap.sh")?.use {
+            var script = it.readBytes().decodeToString()
+            script = script.replace("{entry}", runtimeProps.getProperty("entry"))
+            script.toByteArray()
+        }!!
+    }
+
+    private fun apk2ash(apk: MappedByteBuffer, ash: MappedByteBuffer, size: Int, runtimeProps: Properties) {
         // 1. write header
         ash.putInt(LFH_SIGN)
-        ash.put(javaClass.getResourceAsStream("/bootstrap.sh")?.use { it.readBytes() }!!)
+        ash.put(parseBootstrapScript(runtimeProps))
 
         // 2. append apk file
         ash.position(PAGE_ALIGN)

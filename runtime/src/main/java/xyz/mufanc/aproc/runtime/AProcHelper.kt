@@ -4,25 +4,16 @@ import android.os.Build
 import org.joor.Reflect
 import java.util.Properties
 
-object Main {
+object AProcHelper {
 
     private val APROC_APK = System.getenv("APROC_APK")!!
 
-    @JvmStatic
-    fun main(args: Array<String>) {
-        setup()
-
-        val props = javaClass.getResourceAsStream("/META-INF/aproc.properties")?.use {
+    fun fixLoadLibrary() {
+        val targetSdk = javaClass.getResourceAsStream("/META-INF/aproc.properties")?.use {
             val props = Properties()
             props.load(it)
-            props
+            props.getProperty("targetSdk").toInt()
         }
-
-        Class.forName(props!!.getProperty("entry")).getMethod("main", Array<String>::class.java).invoke(null, args)
-    }
-
-    private fun setup() {
-        val targetSdk = ManifestHelper().parseTargetSdk() ?: Build.VERSION.SDK_INT
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             Reflect.onClass("com.android.internal.os.ClassLoaderFactory").call(

@@ -31,12 +31,12 @@ plugins {
 }
 ```
 
-3. annotate entry point with `@ShellEntry`
+3. annotate entry point with `@AProcEntry`
 
 ```kotlin
-import xyz.mufanc.aproc.annotation.ShellEntry
+import xyz.mufanc.aproc.annotation.AProcEntry
 
-@ShellEntry
+@AProcEntry
 object Main {
 
     @JvmStatic
