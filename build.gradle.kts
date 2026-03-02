@@ -16,5 +16,5 @@ val cfgNdkVersion by extra("29.0.14206865")
 
 subprojects {
     group = "xyz.mufanc.aproc"
-    version = "1.1.0"
+    version = "2.0.0"
 }
