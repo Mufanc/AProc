@@ -8,17 +8,10 @@ plugins {
 
 val cfgSourceCompatibility: JavaVersion by rootProject.extra
 val cfgTargetCompatibility: JavaVersion by rootProject.extra
-val cfgKotlinJvmTarget: JvmTarget by rootProject.extra
 
 java {
     sourceCompatibility = cfgSourceCompatibility
     targetCompatibility = cfgTargetCompatibility
-}
-
-kotlin {
-    compilerOptions {
-        jvmTarget.set(cfgKotlinJvmTarget)
-    }
 }
 
 afterEvaluate {

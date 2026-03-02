@@ -1,24 +1,21 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import com.android.build.api.dsl.LibraryExtension
 
 plugins {
     id("maven-publish")
     alias(libs.plugins.agp.lib)
-    alias(libs.plugins.kotlin.android)
 }
 
 val cfgMinSdkVersion: Int by rootProject.extra
 val cfgCompileSdkVersion: Int by rootProject.extra
 val cfgSourceCompatibility: JavaVersion by rootProject.extra
 val cfgTargetCompatibility: JavaVersion by rootProject.extra
-val cfgKotlinJvmTarget: JvmTarget by rootProject.extra
 
-android {
+configure<LibraryExtension> {
     namespace = "xyz.mufanc.aproc.runtime"
     compileSdk = cfgCompileSdkVersion
 
     defaultConfig {
         minSdk = cfgMinSdkVersion
-        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -35,19 +32,6 @@ android {
 
     publishing {
         singleVariant("release")
-    }
-
-    sourceSets {
-        getByName("main") {
-            java.srcDirs("external/manifest-editor/lib/src/main/java")
-            resources.srcDirs("external/manifest-editor/lib/src/main")
-        }
-    }
-}
-
-kotlin {
-    compilerOptions {
-        jvmTarget.set(cfgKotlinJvmTarget)
     }
 }
 

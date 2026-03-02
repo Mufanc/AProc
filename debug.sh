@@ -1,5 +1,7 @@
 set -eux
 
+export GRADLE_OPTS="--enable-native-access=ALL-UNNAMED"
+
 ./gradlew publishToMavenLocal
 ./gradlew :demo:assemble -Pdemo=1
 

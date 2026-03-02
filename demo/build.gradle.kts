@@ -1,8 +1,7 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import com.android.build.api.dsl.ApplicationExtension
 
 plugins {
     alias(libs.plugins.agp.app)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
 }
 
@@ -31,10 +30,9 @@ val cfgTargetSdkVersion: Int by rootProject.extra
 val cfgCompileSdkVersion: Int by rootProject.extra
 val cfgSourceCompatibility: JavaVersion by rootProject.extra
 val cfgTargetCompatibility: JavaVersion by rootProject.extra
-val cfgKotlinJvmTarget: JvmTarget by rootProject.extra
 val cfgNdkVersion: String by rootProject.extra
 
-android {
+configure<ApplicationExtension> {
     namespace = "xyz.mufanc.aproc"
     compileSdk = cfgCompileSdkVersion
     ndkVersion = cfgNdkVersion
@@ -62,12 +60,6 @@ android {
             path = file("src/main/cpp/CMakeLists.txt")
             version = "3.22.1"
         }
-    }
-}
-
-kotlin {
-    compilerOptions {
-        jvmTarget.set(cfgKotlinJvmTarget)
     }
 }
 

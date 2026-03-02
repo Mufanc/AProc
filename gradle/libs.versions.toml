@@ -1,7 +1,7 @@
 [versions]
-agp = "8.13.2"
-kotlin = "2.3.0"
-ksp = "2.3.0"
+agp = "9.0.1"
+kotlin = "2.3.10"
+ksp = "2.3.6"
 joor = "0.9.15"
 
 [libraries]

@@ -1,6 +1,7 @@
 package xyz.mufanc.aproc.plugin
 
-import com.android.build.gradle.AppExtension
+import com.android.build.api.artifact.SingleArtifact
+import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import java.io.File
@@ -45,28 +46,40 @@ class AProcPlugin : Plugin<Project> {
     }
 
     override fun apply(project: Project) {
-        project.afterEvaluate {
-            project.plugins.withId("com.android.application") {
-                val android = project.extensions.getByType(AppExtension::class.java)
+        project.plugins.withId("com.android.application") {
+            val androidComponents = project.extensions.getByType(ApplicationAndroidComponentsExtension::class.java)
 
-                android.applicationVariants.forEach { variant ->
-                    variant.outputs.forEach { output ->
-                        val kspTask = project.tasks.findByName("ksp${variant.name.capitalize()}Kotlin").expect("ksp task not found")
-                        val propsFile = project.layout.buildDirectory
-                            .dir("generated/ksp/${variant.name}/resources/META-INF/aproc.properties")
-                            .get().asFile
+            androidComponents.onVariants { variant ->
+                val variantName = variant.name
+                val kspTaskName = "ksp${variantName.capitalize()}Kotlin"
+                
+                val propertiesFileProvider = project.layout.buildDirectory
+                    .file("generated/ksp/$variantName/resources/META-INF/aproc.properties")
 
-                        kspTask.doLast {
-                            val runtimeProps = propsFile.inputStream().use { Properties().apply { load(it) } }
-                            runtimeProps["targetSdk"] = "${android.defaultConfig.targetSdk!!}"
-                            runtimeProps.store(propsFile.outputStream(), null)
+                project.tasks.matching { it.name == kspTaskName }.configureEach { kspTask ->
+                    kspTask.doLast {
+                        val propertiesFile = propertiesFileProvider.get().asFile
+                        if (propertiesFile.exists()) {
+                            val runtimeProps = propertiesFile.inputStream().use { Properties().apply { load(it) } }
+                            runtimeProps["targetSdk"] = variant.targetSdk.apiLevel.toString()
+                            propertiesFile.outputStream().use { runtimeProps.store(it, null) }
                         }
+                    }
+                }
 
-                        val assembleTask = variant.assembleProvider.get()
+                val outputDirProvider = variant.artifacts.get(SingleArtifact.APK)
+                val assembleTaskName = "assemble${variantName.capitalize()}"
 
-                        assembleTask.doLast {
+                project.tasks.matching { it.name == assembleTaskName }.configureEach { assembleTask ->
+                    assembleTask.doLast {
+                        val outputDir = outputDirProvider.get().asFile
+                        val propsFile = propertiesFileProvider.get().asFile
+                        
+                        if (propsFile.exists()) {
                             val runtimeProps = propsFile.inputStream().use { Properties().apply { load(it) } }
-                            apk2ash(output.outputFile, runtimeProps.expect("runtime props is null"))
+                            outputDir.walkTopDown().filter { it.extension == "apk" }.forEach { apkFile ->
+                                apk2ash(apkFile, runtimeProps)
+                            }
                         }
                     }
                 }

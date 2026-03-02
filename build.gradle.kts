@@ -12,7 +12,6 @@ val cfgTargetSdkVersion by extra(36)
 val cfgCompileSdkVersion by extra(36)
 val cfgSourceCompatibility by extra(JavaVersion.VERSION_17)
 val cfgTargetCompatibility by extra(JavaVersion.VERSION_17)
-val cfgKotlinJvmTarget by extra(JvmTarget.JVM_17)
 val cfgNdkVersion by extra("29.0.14206865")
 
 subprojects {
