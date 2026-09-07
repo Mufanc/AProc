@@ -21,14 +21,12 @@ class AProcProcessor(
     }
 
     override fun process(resolver: Resolver): List<KSAnnotated> = env.run {
-        mEntries.addAll(
-            resolver.getSymbolsWithAnnotation(AProcEntry::class.qualifiedName!!)
-                .filterIsInstance<KSClassDeclaration>().toList()
-                .map { it.qualifiedName!!.asString() }
-        )
+        val entries = resolver.getSymbolsWithAnnotation(AProcEntry::class.qualifiedName!!)
+            .filterIsInstance<KSClassDeclaration>().toList()
+        mEntries.addAll(entries.map { it.qualifiedName!!.asString() })
 
         if (mEntries.size != 1) {
-            logger.error("AProc must be annotated on a single class")
+            logger.error("AProc must be annotated on a single class; found ${mEntries.size}: $mEntries")
             return@run emptyList()
         }
 
@@ -36,7 +34,8 @@ class AProcProcessor(
             isGenerated = true
 
             val entry = mEntries.first()
-            val property = codeGenerator.createNewFileByPath(Dependencies(false), "META-INF/aproc", "properties")
+            val dependencies = Dependencies(true, *entries.mapNotNull { it.containingFile }.toTypedArray())
+            val property = codeGenerator.createNewFileByPath(dependencies, "META-INF/aproc", "properties")
 
             val props = makeProperties {
                 setProperty("entry", entry)
